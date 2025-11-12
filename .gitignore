@@ -1,0 +1,8 @@
+# Archivos de configuración y de entorno
+.env
+git 
+# Dependencias (carpeta completa)
+node_modules/
+
+# Archivo de prueba específico
+test-bcrypt.js
