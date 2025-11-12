@@ -42,9 +42,9 @@ Establecer la base funcional del proyecto con autenticación inicial, estructura
 |----|--------|--------------|----------------|
 | T1 | Crear estructura de carpetas (frontend, backend, database, docs). | Ernesto | ✅ Hecho |
 | T2 | Configurar React + Vite en frontend. | Ernesto | ⏳ Pendiente |
-| T3 | Configurar backend con Express y conexión a MySQL. | Ernesto | ⏳ Pendiente |
-| T4 | Crear tablas base sin relaciones complejas. | Ernesto | ⏳ Pendiente |
-| T5 | Endpoint `/login` funcional. | Ernesto | ⏳ Pendiente |
+| T3 | Configurar backend con Express y conexión a MySQL. | Ernesto | ✅ Pendiente |
+| T4 | Crear tablas base sin relaciones complejas. | Ernesto | ✅ Pendiente |
+| T5 | Endpoint `/login` funcional. | Ernesto | ✅ Pendiente |
 | T6 | Diseñar pantalla de login y registro en Figma. | Ernesto| ⏳ Pendiente |
 | T7 | Endpoint `/register` funcional. | Diego | ⏳ Pendiente |
 | T8 | Diseño del Dashboard principal. | Diego | ⏳ Pendiente |
