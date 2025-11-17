@@ -40,16 +40,16 @@ Establecer la base funcional del proyecto con autenticación inicial, estructura
 
 | ID | Tarea | Responsable | Estado inicial |
 |----|--------|--------------|----------------|
-| T1 | Crear estructura de carpetas (frontend, backend, database, docs). | Ernesto | ✅ Hecho |
-| T2 | Configurar React + Vite en frontend. | Ernesto | ✅ Pendiente |
-| T3 | Configurar backend con Express y conexión a MySQL. | Ernesto | ✅ Pendiente |
-| T4 | Crear tablas base sin relaciones complejas. | Ernesto | ✅ Pendiente |
-| T5 | Endpoint `/login` funcional. | Ernesto | ✅ Pendiente |
-| T6 | Diseñar pantalla de login y registro en Figma. | Ernesto| ✅ Pendiente |
-| T7 | Endpoint `/register` funcional. | Diego | ⏳ Pendiente |
-| T8 | Diseño del Dashboard principal. | Diego | ⏳ Pendiente |
-| T9 | Integrar login + dashboard. | Paola | ⏳ Pendiente |
-| T10 | Documentar OpenAPI. | Paola | ⏳ Pendiente |
+| T1 | Crear estructura de carpetas (frontend, backend, database, docs). | Ernesto LISTO
+| T2 | Configurar React + Vite en frontend. | Ernesto LISTO
+| T3 | Configurar backend con Express y conexión a MySQL. | Ernesto LISTO
+| T4 | Crear tablas base sin relaciones complejas. | Ernesto LISTO
+| T5 | Endpoint `/login` funcional. | Ernesto LISTO
+| T6 | Diseñar pantalla de login y registro en Figma. | Ernesto LISTO
+| T7 | Endpoint `/register` funcional. | Diego LISTO
+| T8 | Diseño del Dashboard principal. | Diego LISTO
+| T9 | Integrar login + dashboard. | Paola PENDIENTE
+| T10 | Documentar OpenAPI. | Paola PENDIENTE
 
 ---
 
