@@ -44,6 +44,10 @@ export default function LoginForm({ onLoginSuccess }) {
       />
       <button type="submit">Entrar</button>
       {error && <p className="error">{error}</p>}
+      <p>
+      ¿No tienes cuenta?{" "}
+      <a href="/register">Regístrate aquí</a>
+      </p> 
     </form>
   );
 }
