@@ -1,42 +1,64 @@
-import { useState } from 'react';
-import { 
-  Container, 
-  Paper, 
-  TextField, 
-  Button, 
-  Typography, 
-  Box, 
+import { useState } from "react";
+import {
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Box,
+  Typography,
   Alert,
   CircularProgress,
   Divider
-} from '@mui/material';
-import { SportsSoccer, Email, Lock } from '@mui/icons-material';
-import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api';
+} from "@mui/material";
+import { SportsSoccer, Person, Email, Lock, VpnKey } from "@mui/icons-material";
+import { useNavigate, Link } from "react-router-dom";
+import api from "../services/api";
 
-export default function LoginPage() {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+export default function RegisterPage() {
+  const [form, setForm] = useState({
+    nombre: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
+    setSuccess("");
     setLoading(true);
 
+    if (form.password !== form.confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { data } = await api.post('/login', form);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
-      
-      if (data.usuario.rol === 'admin') {
-        navigate('/dashboard');
-      } else {
-        navigate('/perfil');
-      }
+      const { data } = await api.post("/register", {
+        nombre: form.nombre,
+        email: form.email,
+        password: form.password
+      });
+
+      setSuccess("¡Registro exitoso! Redirigiendo al login...");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+      if (err.response?.status === 409) {
+        setError("El correo ya está registrado");
+      } else {
+        setError("Error al registrar usuario");
+      }
     } finally {
       setLoading(false);
     }
@@ -89,11 +111,48 @@ export default function LoginPage() {
               Gestión de Torneos y Competencias
             </Typography>
             <Typography variant="h6" color="#666" sx={{ mt: 1 }}>
-              Iniciar Sesión
+              Crear Cuenta
             </Typography>
           </Box>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            {/* Campo Nombre */}
+            <Box sx={{ position: 'relative', mb: 3 }}>
+              <Person 
+                sx={{ 
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#667eea',
+                  zIndex: 1
+                }} 
+              />
+              <TextField
+                required
+                fullWidth
+                id="nombre"
+                label="Nombre Completo"
+                name="nombre"
+                autoComplete="name"
+                autoFocus
+                value={form.nombre}
+                onChange={handleChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    pl: 4.5,
+                    borderRadius: 3,
+                    '& fieldset': {
+                      borderColor: '#e0e0e0',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  }
+                }}
+              />
+            </Box>
+
             {/* Campo Email */}
             <Box sx={{ position: 'relative', mb: 3 }}>
               <Email 
@@ -113,9 +172,8 @@ export default function LoginPage() {
                 label="Correo Electrónico"
                 name="email"
                 autoComplete="email"
-                autoFocus
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onChange={handleChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     pl: 4.5,
@@ -132,7 +190,7 @@ export default function LoginPage() {
             </Box>
 
             {/* Campo Contraseña */}
-            <Box sx={{ position: 'relative', mb: 4 }}>
+            <Box sx={{ position: 'relative', mb: 3 }}>
               <Lock 
                 sx={{ 
                   position: 'absolute',
@@ -150,9 +208,45 @@ export default function LoginPage() {
                 label="Contraseña"
                 type="password"
                 id="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                onChange={handleChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    pl: 4.5,
+                    borderRadius: 3,
+                    '& fieldset': {
+                      borderColor: '#e0e0e0',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#667eea',
+                    },
+                  }
+                }}
+              />
+            </Box>
+
+            {/* Campo Confirmar Contraseña */}
+            <Box sx={{ position: 'relative', mb: 4 }}>
+              <VpnKey 
+                sx={{ 
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#667eea',
+                  zIndex: 1
+                }} 
+              />
+              <TextField
+                required
+                fullWidth
+                name="confirmPassword"
+                label="Confirmar Contraseña"
+                type="password"
+                id="confirmPassword"
+                value={form.confirmPassword}
+                onChange={handleChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     pl: 4.5,
@@ -171,6 +265,12 @@ export default function LoginPage() {
             {error && (
               <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
                 {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                {success}
               </Alert>
             )}
 
@@ -195,19 +295,19 @@ export default function LoginPage() {
                 mb: 3
               }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar Sesión'}
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Registrarme'}
             </Button>
 
             <Divider sx={{ my: 3 }}>
               <Typography variant="body2" color="text.secondary">
-                ¿No tienes cuenta?
+                ¿Ya tienes cuenta?
               </Typography>
             </Divider>
 
             <Box textAlign="center">
               <Button
                 component={Link}
-                to="/register"
+                to="/"
                 variant="outlined"
                 fullWidth
                 size="large"
@@ -226,7 +326,7 @@ export default function LoginPage() {
                   transition: 'all 0.3s ease'
                 }}
               >
-                Crear Cuenta
+                Iniciar Sesión
               </Button>
             </Box>
           </Box>
