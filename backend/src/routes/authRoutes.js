@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { db } from '../config/db.js';
 import dotenv from 'dotenv';
+import { verifyToken } from '../middlewares/auth.js';
 dotenv.config();
 
 const router = Router();
@@ -67,5 +68,15 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 });
+
+
+// Endpoint para verificar token
+router.get('/verify', verifyToken, (req, res) => {
+  res.json({
+    message: 'Token válido',
+    usuario: req.user
+  });
+});
+
 
 export default router;
