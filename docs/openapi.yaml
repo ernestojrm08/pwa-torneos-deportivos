@@ -1,0 +1,345 @@
+openapi: 3.0.0
+info:
+  title: Sistema de Gestión de Torneos Deportivos
+  description: API REST para la gestión de torneos deportivos, usuarios e inscripciones
+  version: 1.0.0
+  contact:
+    name: Equipo de Desarrollo
+    email: desarrollo@torneos.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Usuario:
+      type: object
+      required:
+        - nombre
+        - email
+        - password
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        email:
+          type: string
+          format: email
+          example: "juan@email.com"
+        password:
+          type: string
+          format: password
+          example: "password123"
+        rol:
+          type: string
+          enum: [admin, atleta]
+          example: "atleta"
+        telefono:
+          type: string
+          example: "+1234567890"
+        fecha_nacimiento:
+          type: string
+          format: date
+          example: "1995-05-15"
+        genero:
+          type: string
+          enum: [masculino, femenino, otro]
+          example: "masculino"
+
+    Torneo:
+      type: object
+      required:
+        - nombre
+        - fecha
+        - ubicacion
+        - deporte_id
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Torneo de Fútbol Primavera 2024"
+        descripcion:
+          type: string
+          example: "Campeonato anual de fútbol"
+        fecha:
+          type: string
+          format: date
+          example: "2024-06-15"
+        hora:
+          type: string
+          format: time
+          example: "10:00:00"
+        ubicacion:
+          type: string
+          example: "Estadio Municipal"
+        deporte_id:
+          type: integer
+          example: 1
+        estado:
+          type: string
+          enum: [abierto, en curso, finalizado, cancelado]
+          example: "abierto"
+        cupos_maximos:
+          type: integer
+          example: 20
+
+    Inscripcion:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        torneo_id:
+          type: integer
+          example: 1
+        atleta_id:
+          type: integer
+          example: 3
+        fecha_inscripcion:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+        estado:
+          type: string
+          enum: [confirmada, pendiente, cancelada]
+          example: "confirmada"
+
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Login exitoso"
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Error descriptivo"
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+
+paths:
+  /auth/register:
+    post:
+      summary: Registrar nuevo usuario
+      tags: [Autenticación]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        201:
+          description: Usuario registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        409:
+          description: El email ya está registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      tags: [Autenticación]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        200:
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        401:
+          description: Credenciales inválidas
+        404:
+          description: Usuario no encontrado
+
+  /auth/verify:
+    get:
+      summary: Verificar token JWT
+      tags: [Autenticación]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Token válido
+        401:
+          description: Token inválido o expirado
+
+  /admin/dashboard:
+    get:
+      summary: Obtener métricas del dashboard administrativo
+      tags: [Administración]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Métricas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usuarios:
+                    type: integer
+                    example: 150
+                  torneos_activos:
+                    type: integer
+                    example: 8
+                  inscripciones:
+                    type: integer
+                    example: 320
+        403:
+          description: No tiene permisos de administrador
+
+  /admin/torneos:
+    get:
+      summary: Listar torneos (con paginación)
+      tags: [Torneos]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        200:
+          description: Lista de torneos obtenida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Torneo'
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  total:
+                    type: integer
+
+    post:
+      summary: Crear nuevo torneo
+      tags: [Torneos]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Torneo'
+      responses:
+        201:
+          description: Torneo creado exitosamente
+        400:
+          description: Datos de torneo inválidos
+
+  /atleta/perfil:
+    get:
+      summary: Obtener perfil completo del atleta
+      tags: [Atleta]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Perfil obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inscripciones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Inscripcion'
+                  resultados:
+                    type: array
+                    items:
+                      type: object
+                  torneosDisponibles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Torneo'
+
+  /atleta/inscribirse/{torneoId}:
+    post:
+      summary: Inscribir atleta en torneo
+      tags: [Atleta]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: torneoId
+          required: true
+          schema:
+            type: integer
+      responses:
+        201:
+          description: Inscripción exitosa
+        409:
+          description: Ya está inscrito en este torneo
+        400:
+          description: No hay cupos disponibles
+
+tags:
+  - name: Autenticación
+    description: Endpoints de autenticación y registro
+  - name: Administración
+    description: Endpoints exclusivos para administradores
+  - name: Torneos
+    description: Gestión de torneos deportivos
+  - name: Atleta
+    description: Funcionalidades para atletas
