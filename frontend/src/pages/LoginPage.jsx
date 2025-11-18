@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { SportsSoccer, Email, Lock } from '@mui/icons-material';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 export default function LoginPage() {
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,16 +29,27 @@ export default function LoginPage() {
 
     try {
       const { data } = await api.post('/login', form);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
       
+      // Usar el contexto de auth en lugar de localStorage directo
+      login(data.usuario, data.token);
+      
+      // Redirigir según el rol
       if (data.usuario.rol === 'admin') {
         navigate('/dashboard');
       } else {
         navigate('/perfil');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+      console.error('Error en login:', err);
+      if (err.response?.status === 401) {
+        setError('Contraseña incorrecta');
+      } else if (err.response?.status === 404) {
+        setError('Usuario no encontrado');
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Error al iniciar sesión. Intente nuevamente.');
+      }
     } finally {
       setLoading(false);
     }

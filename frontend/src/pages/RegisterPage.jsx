@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { SportsSoccer, Person, Email, Lock, VpnKey } from "@mui/icons-material";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 import api from "../services/api";
 
 export default function RegisterPage() {
@@ -25,6 +26,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,8 +38,15 @@ export default function RegisterPage() {
     setSuccess("");
     setLoading(true);
 
+    // Validaciones del frontend
     if (form.password !== form.confirmPassword) {
       setError("Las contraseñas no coinciden");
+      setLoading(false);
+      return;
+    }
+
+    if (form.password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
       setLoading(false);
       return;
     }
@@ -49,15 +58,24 @@ export default function RegisterPage() {
         password: form.password
       });
 
+      // Opción 1: Login automático después del registro
+      // login(data.usuario, data.token);
+      // navigate(data.usuario.rol === 'admin' ? '/dashboard' : '/perfil');
+
+      // Opción 2: Redirigir al login (actual)
       setSuccess("¡Registro exitoso! Redirigiendo al login...");
       setTimeout(() => {
         navigate("/");
       }, 2000);
+
     } catch (err) {
+      console.error('Error en registro:', err);
       if (err.response?.status === 409) {
         setError("El correo ya está registrado");
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
       } else {
-        setError("Error al registrar usuario");
+        setError("Error al registrar usuario. Intente nuevamente.");
       }
     } finally {
       setLoading(false);
@@ -211,6 +229,7 @@ export default function RegisterPage() {
                 autoComplete="new-password"
                 value={form.password}
                 onChange={handleChange}
+                helperText="Mínimo 6 caracteres"
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     pl: 4.5,
