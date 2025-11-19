@@ -25,7 +25,8 @@ import {
   EmojiEvents,
   Logout,
   Group,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Category  // ✅ AGREGAR ESTA IMPORTACIÓN
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { clearAuth, getUsuario } from '../utils/auth';
@@ -51,6 +52,8 @@ export default function EnhancedLayout({ children }) {
 
   const adminMenuItems = [
     { text: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
+    { text: 'Gestión de Deportes', path: '/dashboard/deportes', icon: <SportsEsports /> },
+    { text: 'Gestión de Categorías', path: '/dashboard/categorias', icon: <Category /> }, // ✅ CORREGIDO
     { text: 'Gestión de Torneos', path: '/dashboard/torneos', icon: <SportsEsports /> },
     { text: 'Usuarios', path: '/dashboard/usuarios', icon: <Group /> }
   ];

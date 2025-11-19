@@ -32,7 +32,9 @@ export const isTokenExpired = (token) => {
   
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.exp * 1000 < Date.now();
+    const isExpired = payload.exp * 1000 < Date.now();
+    console.log('⏰ Token expira:', new Date(payload.exp * 1000), 'Expirado:', isExpired);
+    return isExpired;
   } catch (error) {
     console.error('Error checking token expiration:', error);
     return true;
@@ -51,3 +53,4 @@ export const isAdmin = () => {
 export const isAtleta = () => {
   return getUserRole() === 'atleta';
 };
+
