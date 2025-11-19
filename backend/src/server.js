@@ -8,6 +8,10 @@ import { db } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import atletaRoutes from './routes/atletaRoutes.js';
+import deportesRoutes from './routes/deportesRoutes.js';
+import categoriasRoutes from './routes/categoriasRoutes.js';
+import { verify } from 'crypto';
+import { verifyToken } from './middlewares/auth.js';
 
 dotenv.config();
 
@@ -27,6 +31,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/atleta', atletaRoutes);
+app.use('/api/deportes', deportesRoutes);
+app.use('/api/categorias', categoriasRoutes);
+
 
 app.get('/', (req, res) => {
   res.send('API PWA Torneos Deportivos corriendo correctamente');

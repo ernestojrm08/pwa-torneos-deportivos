@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
 
 
 // Endpoint para verificar token
-router.get('/verify', verifyToken, (req, res) => {
+router.get('/auth/verify', verifyToken, (req, res) => {
   res.json({
     message: 'Token válido',
     usuario: req.user
