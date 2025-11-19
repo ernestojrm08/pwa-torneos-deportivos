@@ -1,9 +1,48 @@
 -- Atleta: atleta@exp.com pass: 123456
 -- Administrador: administrador@exp.com pass: 123456
+-- Script sql actualizado para la fase 2 del proyecto PWA Torneos Deportivos
 
 DROP DATABASE IF EXISTS torneos_db;
 CREATE DATABASE torneos_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE torneos_db;
+
+CREATE TABLE `categorias` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `deporte_id` int(11) DEFAULT NULL,
+  `edad_minima` int(11) DEFAULT NULL,
+  `edad_maxima` int(11) DEFAULT NULL,
+  `distancia` decimal(10,2) DEFAULT NULL,
+  `unidad` varchar(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `categorias`
+--
+
+INSERT INTO `categorias` (`id`, `nombre`, `descripcion`, `deporte_id`, `edad_minima`, `edad_maxima`, `distancia`, `unidad`, `created_at`) VALUES
+(1, '5K Aguas Abiertas', 'Carrera 5km en aguas abiertas', 4, 18, NULL, 5.00, 'kilometros', '2025-11-19 01:58:22'),
+(3, 'Infantil A (8-10)', 'Categoría infantil 8-10 años', 5, 8, 10, 25.00, 'metros', '2025-11-19 01:58:22'),
+(4, 'Infantil B (11-13)', 'Categoría infantil 11-13 años', 5, 11, 13, 50.00, 'metros', '2025-11-19 01:58:22'),
+(5, 'Juvenil A (14-16)', 'Categoría juvenil 14-16 años', 5, 14, 16, 100.00, 'metros', '2025-11-19 01:58:22'),
+(6, 'Juvenil B (17-18)', 'Categoría juvenil 17-18 años', 5, 17, 18, 200.00, 'metros', '2025-11-19 01:58:22'),
+(7, 'Adultos (19-35)', 'Categoría adultos 19-35 años', 5, 19, 35, 100.00, 'metros', '2025-11-19 01:58:22'),
+(8, 'Master (36+)', 'Categoría master +36 años', 5, 36, NULL, 100.00, 'metros', '2025-11-19 01:58:22'),
+(9, 'Sprint', 'Triatlón sprint - 750m natación', 6, 18, 39, 750.00, 'metros', '2025-11-19 01:58:22'),
+(10, 'Olímpico', 'Triatlón olímpico - 1500m natación', 6, 18, 39, 1500.00, 'metros', '2025-11-19 01:58:22'),
+(11, 'Half Ironman', 'Media distancia Ironman', 6, 18, NULL, 1900.00, 'metros', '2025-11-19 01:58:22'),
+(12, '5K', 'Carrera 5 kilómetros', 7, 16, NULL, 5.00, 'kilometros', '2025-11-19 01:58:22'),
+(13, '10K', 'Carrera 10 kilómetros', 7, 16, NULL, 10.00, 'kilometros', '2025-11-19 01:58:22'),
+(14, '21K', 'Media maratón 21km', 7, 18, NULL, 21.10, 'kilometros', '2025-11-19 01:58:22'),
+(15, '42K', 'Maratón completo 42km', 7, 18, NULL, 42.20, 'kilometros', '2025-11-19 01:58:22');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `deportes`
+--
 
 CREATE TABLE `deportes` (
   `id` int(11) NOT NULL,
@@ -16,10 +55,10 @@ CREATE TABLE `deportes` (
 --
 
 INSERT INTO `deportes` (`id`, `nombre`, `descripcion`) VALUES
-(4, 'Fútbol', 'Deporte de equipo con balón'),
-(5, 'Baloncesto', 'Deporte de canasta'),
-(6, 'Tenis', 'Deporte de raqueta'),
-(7, 'Voleibol', 'Deporte de equipo con red'),
+(4, 'Aguas Abiertas', 'Competencias de natación en aguas abiertas'),
+(5, 'Natación', 'Competencias de natación en piscina'),
+(6, 'Triatlón', 'Competencias de triatlón'),
+(7, 'Atletismo', 'Competencias de atletismo'),
 (8, 'Atletismo', 'Deporte de pista y campo');
 
 -- --------------------------------------------------------
@@ -40,16 +79,16 @@ CREATE TABLE `inscripciones` (
 --
 
 INSERT INTO `inscripciones` (`id`, `torneo_id`, `atleta_id`, `fecha_inscripcion`) VALUES
-(13, 19, 3, '2025-11-14 18:34:40'),
-(14, 19, 4, '2025-11-14 18:34:40'),
-(15, 20, 3, '2025-11-14 18:34:40'),
-(16, 21, 4, '2025-11-14 18:34:40'),
-(17, 22, 3, '2025-11-14 18:34:40'),
-(18, 22, 4, '2025-11-14 18:34:40'),
-(19, 20, 4, '2025-11-14 19:16:47'),
-(20, 24, 4, '2025-11-17 23:09:24'),
-(21, 19, 9, '2025-11-17 23:58:38'),
-(22, 21, 9, '2025-11-17 23:58:40');
+(13, 19, 3, '2025-11-14 22:34:40'),
+(14, 19, 4, '2025-11-14 22:34:40'),
+(15, 20, 3, '2025-11-14 22:34:40'),
+(16, 21, 4, '2025-11-14 22:34:40'),
+(17, 22, 3, '2025-11-14 22:34:40'),
+(18, 22, 4, '2025-11-14 22:34:40'),
+(19, 20, 4, '2025-11-14 23:16:47'),
+(20, 24, 4, '2025-11-18 03:09:24'),
+(21, 19, 9, '2025-11-18 03:58:38'),
+(22, 21, 9, '2025-11-18 03:58:40');
 
 -- --------------------------------------------------------
 
@@ -138,6 +177,13 @@ INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol`) VALUES
 --
 
 --
+-- Indices de la tabla `categorias`
+--
+ALTER TABLE `categorias`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `deporte_id` (`deporte_id`);
+
+--
 -- Indices de la tabla `deportes`
 --
 ALTER TABLE `deportes`
@@ -178,10 +224,16 @@ ALTER TABLE `usuarios`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `categorias`
+--
+ALTER TABLE `categorias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
 -- AUTO_INCREMENT de la tabla `deportes`
 --
 ALTER TABLE `deportes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `inscripciones`
@@ -210,6 +262,12 @@ ALTER TABLE `usuarios`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `categorias`
+--
+ALTER TABLE `categorias`
+  ADD CONSTRAINT `categorias_ibfk_1` FOREIGN KEY (`deporte_id`) REFERENCES `deportes` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `inscripciones`
