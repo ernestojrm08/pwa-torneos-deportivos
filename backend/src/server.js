@@ -10,8 +10,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import atletaRoutes from './routes/atletaRoutes.js';
 import deportesRoutes from './routes/deportesRoutes.js';
 import categoriasRoutes from './routes/categoriasRoutes.js';
-import { verify } from 'crypto';
-import { verifyToken } from './middlewares/auth.js';
+import atletasRoutes from './routes/atletasRoutes.js';
 
 dotenv.config();
 
@@ -33,7 +32,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/atleta', atletaRoutes);
 app.use('/api/deportes', deportesRoutes);
 app.use('/api/categorias', categoriasRoutes);
-
+app.use('/api/atletas', atletasRoutes);
 
 app.get('/', (req, res) => {
   res.send('API PWA Torneos Deportivos corriendo correctamente');
