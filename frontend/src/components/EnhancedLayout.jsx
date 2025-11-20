@@ -59,11 +59,11 @@ export default function EnhancedLayout({ children }) {
   ];
 
   const atletaMenuItems = [
-    { text: 'Mi Perfil', path: '/perfil', icon: <Person /> },
-    { text: 'Torneos Disponibles', path: '/perfil/torneos', icon: <SportsEsports /> },
-    { text: 'Mis Inscripciones', path: '/perfil/inscripciones', icon: <HowToReg /> },
-    { text: 'Mis Resultados', path: '/perfil/resultados', icon: <EmojiEvents /> }
-  ];
+  { text: 'Mi Dashboard', path: '/atleta/dashboard', icon: <Dashboard /> },
+  { text: 'Gestionar Inscripciones', path: '/atleta/inscripciones', icon: <HowToReg /> },
+  { text: 'Torneos Disponibles', path: '/perfil/torneos', icon: <SportsEsports /> },
+  { text: 'Mis Resultados', path: '/perfil/resultados', icon: <EmojiEvents /> }
+];
 
   const menuItems = isAdmin ? adminMenuItems : atletaMenuItems;
 

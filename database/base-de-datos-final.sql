@@ -71,24 +71,26 @@ CREATE TABLE `inscripciones` (
   `id` int(11) NOT NULL,
   `torneo_id` int(11) DEFAULT NULL,
   `atleta_id` int(11) DEFAULT NULL,
-  `fecha_inscripcion` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha_inscripcion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `categoria_id` int(11) DEFAULT NULL,
+  `estado` enum('pendiente','confirmada','cancelada') DEFAULT 'confirmada'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `inscripciones`
 --
 
-INSERT INTO `inscripciones` (`id`, `torneo_id`, `atleta_id`, `fecha_inscripcion`) VALUES
-(13, 19, 3, '2025-11-14 22:34:40'),
-(14, 19, 4, '2025-11-14 22:34:40'),
-(15, 20, 3, '2025-11-14 22:34:40'),
-(16, 21, 4, '2025-11-14 22:34:40'),
-(17, 22, 3, '2025-11-14 22:34:40'),
-(18, 22, 4, '2025-11-14 22:34:40'),
-(19, 20, 4, '2025-11-14 23:16:47'),
-(20, 24, 4, '2025-11-18 03:09:24'),
-(21, 19, 9, '2025-11-18 03:58:38'),
-(22, 21, 9, '2025-11-18 03:58:40');
+INSERT INTO `inscripciones` (`id`, `torneo_id`, `atleta_id`, `fecha_inscripcion`, `categoria_id`, `estado`) VALUES
+(13, 19, 3, '2025-11-14 22:34:40', 1, 'confirmada'),
+(14, 19, 4, '2025-11-14 22:34:40', 1, 'confirmada'),
+(15, 20, 3, '2025-11-14 22:34:40', 3, 'confirmada'),
+(16, 21, 4, '2025-11-14 22:34:40', NULL, 'confirmada'),
+(17, 22, 3, '2025-11-14 22:34:40', NULL, 'confirmada'),
+(18, 22, 4, '2025-11-14 22:34:40', NULL, 'confirmada'),
+(19, 20, 4, '2025-11-14 23:16:47', 3, 'confirmada'),
+(20, 24, 4, '2025-11-18 03:09:24', NULL, 'confirmada'),
+(21, 19, 9, '2025-11-18 03:58:38', 1, 'confirmada'),
+(23, 20, 9, '2025-11-20 03:55:20', 5, 'confirmada');
 
 -- --------------------------------------------------------
 
@@ -101,23 +103,24 @@ CREATE TABLE `resultados` (
   `torneo_id` int(11) DEFAULT NULL,
   `atleta_id` int(11) DEFAULT NULL,
   `tiempo` time DEFAULT NULL,
-  `posicion` int(11) DEFAULT NULL
+  `posicion` int(11) DEFAULT NULL,
+  `categoria_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `resultados`
 --
 
-INSERT INTO `resultados` (`id`, `torneo_id`, `atleta_id`, `tiempo`, `posicion`) VALUES
-(8, 19, 2, '90:00:00', 1),
-(9, 19, 3, '90:00:00', 2),
-(10, 19, 4, '90:00:00', 3),
-(11, 20, 4, '40:00:00', 1),
-(12, 20, 2, '40:00:00', 2),
-(13, 21, 3, NULL, 1),
-(14, 21, 4, NULL, 2),
-(15, 22, 2, NULL, 1),
-(16, 22, 3, NULL, 2);
+INSERT INTO `resultados` (`id`, `torneo_id`, `atleta_id`, `tiempo`, `posicion`, `categoria_id`) VALUES
+(8, 19, 2, '90:00:00', 1, NULL),
+(9, 19, 3, '90:00:00', 2, NULL),
+(10, 19, 4, '90:00:00', 3, NULL),
+(11, 20, 4, '40:00:00', 1, NULL),
+(12, 20, 2, '40:00:00', 2, NULL),
+(13, 21, 3, NULL, 1, NULL),
+(14, 21, 4, NULL, 2, NULL),
+(15, 22, 2, NULL, 1, NULL),
+(16, 22, 3, NULL, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -195,7 +198,8 @@ ALTER TABLE `deportes`
 ALTER TABLE `inscripciones`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_torneo_inscripcion` (`torneo_id`),
-  ADD KEY `fk_atleta_inscripcion` (`atleta_id`);
+  ADD KEY `fk_atleta_inscripcion` (`atleta_id`),
+  ADD KEY `categoria_id` (`categoria_id`);
 
 --
 -- Indices de la tabla `resultados`
@@ -203,7 +207,8 @@ ALTER TABLE `inscripciones`
 ALTER TABLE `resultados`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_torneo_resultado` (`torneo_id`),
-  ADD KEY `fk_atleta_resultado` (`atleta_id`);
+  ADD KEY `fk_atleta_resultado` (`atleta_id`),
+  ADD KEY `categoria_id` (`categoria_id`);
 
 --
 -- Indices de la tabla `torneos`
@@ -239,7 +244,7 @@ ALTER TABLE `deportes`
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `resultados`
@@ -274,14 +279,16 @@ ALTER TABLE `categorias`
 --
 ALTER TABLE `inscripciones`
   ADD CONSTRAINT `fk_atleta_inscripcion` FOREIGN KEY (`atleta_id`) REFERENCES `usuarios` (`id`),
-  ADD CONSTRAINT `fk_torneo_inscripcion` FOREIGN KEY (`torneo_id`) REFERENCES `torneos` (`id`);
+  ADD CONSTRAINT `fk_torneo_inscripcion` FOREIGN KEY (`torneo_id`) REFERENCES `torneos` (`id`),
+  ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`);
 
 --
 -- Filtros para la tabla `resultados`
 --
 ALTER TABLE `resultados`
   ADD CONSTRAINT `fk_atleta_resultado` FOREIGN KEY (`atleta_id`) REFERENCES `usuarios` (`id`),
-  ADD CONSTRAINT `fk_torneo_resultado` FOREIGN KEY (`torneo_id`) REFERENCES `torneos` (`id`);
+  ADD CONSTRAINT `fk_torneo_resultado` FOREIGN KEY (`torneo_id`) REFERENCES `torneos` (`id`),
+  ADD CONSTRAINT `resultados_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`);
 
 --
 -- Filtros para la tabla `torneos`

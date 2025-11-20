@@ -1,3 +1,5 @@
+import DashboardAtletaPage from "./pages/DashboardAtletaPage";
+import InscripcionesPage from "./pages/InscripcionesPage";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from "./pages/LoginPage";
@@ -94,7 +96,7 @@ function PrivateRoute({ children, requiredRole = null }) {
       requiredRole,
       path: window.location.pathname
     });
-    return <Navigate to={user.rol === 'admin' ? '/dashboard' : '/perfil'} replace />;
+    return <Navigate to={user.rol === 'admin' ? '/dashboard' : '/atleta/dashboard'} replace />;
   }
 
   console.log('✅ PrivateRoute: Acceso permitido a', window.location.pathname);
@@ -124,15 +126,6 @@ function TorneosDisponiblesPage() {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Torneos Disponibles</h1>
-      <p>Página en desarrollo - Próximamente</p>
-    </div>
-  );
-}
-
-function MisInscripcionesPage() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>Mis Inscripciones</h1>
       <p>Página en desarrollo - Próximamente</p>
     </div>
   );
@@ -188,7 +181,7 @@ function App() {
             </PrivateRoute>
           } />
           
-          {/* Rutas de atleta */}
+          {/* Rutas de atleta EXISTENTES (se mantienen) */}
           <Route path="/perfil" element={
             <PrivateRoute requiredRole="atleta">
               <PerfilPage />
@@ -201,24 +194,50 @@ function App() {
             </PrivateRoute>
           } />
           
-          <Route path="/perfil/inscripciones" element={
-            <PrivateRoute requiredRole="atleta">
-              <MisInscripcionesPage />
-            </PrivateRoute>
-          } />
-          
           <Route path="/perfil/resultados" element={
             <PrivateRoute requiredRole="atleta">
               <MisResultadosPage />
             </PrivateRoute>
           } />
           
-          {/* Ruta por defecto */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* ✅ NUEVAS RUTAS PARA PERSONA B - MEJORADAS */}
+          <Route path="/atleta/dashboard" element={
+            <PrivateRoute requiredRole="atleta">
+              <DashboardAtletaPage />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/atleta/inscripciones" element={
+            <PrivateRoute requiredRole="atleta">
+              <InscripcionesPage />
+            </PrivateRoute>
+          } />
+          
+          {/* Ruta por defecto - MEJORADA para redirigir según rol */}
+          <Route path="*" element={<RoutePorDefecto />} />
         </Routes>
       </Router>
     </AuthProvider>
   );
+}
+
+// Componente para manejar ruta por defecto inteligente
+function RoutePorDefecto() {
+  const { user, isAuthenticated } = useAuth();
+  
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.rol === 'admin') {
+        navigate('/dashboard');
+      } else {
+        navigate('/atleta/dashboard');
+      }
+    } else {
+      navigate('/');
+    }
+  }, [user, isAuthenticated]);
+
+  return <LoadingSpinner />;
 }
 
 export default App;
