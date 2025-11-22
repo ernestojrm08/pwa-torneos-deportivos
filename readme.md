@@ -29,7 +29,7 @@ PORT=3000
 
 3. Configurar database desde XAMPP_
 
-Abre phpMyAdmin y ejecuta el script database/schema.slq desde el proyecto.
+Abre phpMyAdmin y ejecuta el script database/base-de-datos-final.sql desde el proyecto.
 
 4. Ejecución del servidor
 

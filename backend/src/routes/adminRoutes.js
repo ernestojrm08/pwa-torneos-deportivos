@@ -76,4 +76,116 @@ router.get('/torneos', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// Obtener todos los usuarios
+router.get('/usuarios', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, nombre, email, rol
+      FROM usuarios 
+      ORDER BY nombre ASC
+    `);
+    
+    console.log(`✅ ${rows.length} usuarios encontrados`);
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ Error obteniendo usuarios:', err);
+    res.status(500).json({ message: 'Error obteniendo usuarios' });
+  }
+});
+
+// Editar usuario
+router.put('/usuarios/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, email, rol } = req.body;
+    
+    if (!nombre || !email || !rol) {
+      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    }
+
+    // Verificar que el usuario existe
+    const [usuario] = await db.execute(
+      'SELECT id FROM usuarios WHERE id = ?',
+      [id]
+    );
+    
+    if (usuario.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // No permitir que el último admin se cambie a atleta
+    if (rol === 'atleta') {
+      const [admins] = await db.execute(
+        'SELECT COUNT(*) as count FROM usuarios WHERE rol = "admin" AND id != ?',
+        [id]
+      );
+      
+      if (admins[0].count === 0) {
+        return res.status(400).json({ 
+          message: 'No se puede cambiar el rol. Debe haber al menos un administrador en el sistema.' 
+        });
+      }
+    }
+
+    await db.execute(
+      'UPDATE usuarios SET nombre = ?, email = ?, rol = ? WHERE id = ?',
+      [nombre, email, rol, id]
+    );
+    
+    res.json({ message: 'Usuario actualizado correctamente' });
+    
+  } catch (err) {
+    console.error('❌ Error actualizando usuario:', err);
+    
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'El email ya está registrado' });
+    }
+    
+    res.status(500).json({ message: 'Error actualizando usuario' });
+  }
+});
+
+// Eliminar usuario
+router.delete('/usuarios/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verificar que el usuario existe
+    const [usuario] = await db.execute(
+      'SELECT id, rol FROM usuarios WHERE id = ?',
+      [id]
+    );
+    
+    if (usuario.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // No permitir eliminar el último admin
+    if (usuario[0].rol === 'admin') {
+      const [admins] = await db.execute(
+        'SELECT COUNT(*) as count FROM usuarios WHERE rol = "admin"'
+      );
+      
+      if (admins[0].count === 1) {
+        return res.status(400).json({ 
+          message: 'No se puede eliminar el último administrador del sistema.' 
+        });
+      }
+    }
+
+    // Eliminar registros relacionados primero (inscripciones y resultados)
+    await db.execute('DELETE FROM inscripciones WHERE atleta_id = ?', [id]);
+    await db.execute('DELETE FROM resultados WHERE atleta_id = ?', [id]);
+    
+    // Luego eliminar el usuario
+    await db.execute('DELETE FROM usuarios WHERE id = ?', [id]);
+    
+    res.json({ message: 'Usuario eliminado correctamente' });
+    
+  } catch (err) {
+    console.error('❌ Error eliminando usuario:', err);
+    res.status(500).json({ message: 'Error eliminando usuario' });
+  }
+});
+
 export default router;

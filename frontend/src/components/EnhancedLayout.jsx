@@ -26,7 +26,7 @@ import {
   Logout,
   Group,
   Menu as MenuIcon,
-  Category  // ✅ AGREGAR ESTA IMPORTACIÓN
+  Category
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { clearAuth, getUsuario } from '../utils/auth';
@@ -53,17 +53,17 @@ export default function EnhancedLayout({ children }) {
   const adminMenuItems = [
     { text: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
     { text: 'Gestión de Deportes', path: '/dashboard/deportes', icon: <SportsEsports /> },
-    { text: 'Gestión de Categorías', path: '/dashboard/categorias', icon: <Category /> }, // ✅ CORREGIDO
+    { text: 'Gestión de Categorías', path: '/dashboard/categorias', icon: <Category /> },
     { text: 'Gestión de Torneos', path: '/dashboard/torneos', icon: <SportsEsports /> },
     { text: 'Usuarios', path: '/dashboard/usuarios', icon: <Group /> }
   ];
 
   const atletaMenuItems = [
-  { text: 'Mi Dashboard', path: '/atleta/dashboard', icon: <Dashboard /> },
-  { text: 'Gestionar Inscripciones', path: '/atleta/inscripciones', icon: <HowToReg /> },
-  { text: 'Torneos Disponibles', path: '/perfil/torneos', icon: <SportsEsports /> },
-  { text: 'Mis Resultados', path: '/perfil/resultados', icon: <EmojiEvents /> }
-];
+    { text: 'Mi Dashboard', path: '/atleta/dashboard', icon: <Dashboard /> },
+    { text: 'Gestionar Inscripciones', path: '/atleta/inscripciones', icon: <HowToReg /> },
+    { text: 'Torneos Disponibles', path: '/perfil/torneos', icon: <SportsEsports /> },
+    { text: 'Mis Resultados', path: '/perfil/resultados', icon: <EmojiEvents /> }
+  ];
 
   const menuItems = isAdmin ? adminMenuItems : atletaMenuItems;
 
@@ -172,7 +172,7 @@ export default function EnhancedLayout({ children }) {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       {/* AppBar solo para móviles */}
       {isMobile && (
         <AppBar
@@ -203,34 +203,8 @@ export default function EnhancedLayout({ children }) {
         </AppBar>
       )}
 
-      {/* Drawer para navegación */}
-      <Box
-        component="nav"
-        sx={{ width: 85 }}
-      >
-        {/* Drawer móvil (temporary) */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              borderRight: '1px solid rgba(0,0,0,0.08)',
-              backgroundColor: 'white',
-              boxShadow: '2px 0 12px rgba(0,0,0,0.05)'
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-
-        {/* Drawer desktop (permanent) */}
+      {/* Drawer para desktop - POSITION FIXED */}
+      {!isMobile && (
         <Drawer
           variant="permanent"
           sx={{
@@ -240,31 +214,80 @@ export default function EnhancedLayout({ children }) {
               width: drawerWidth,
               borderRight: '1px solid rgba(0,0,0,0.08)',
               backgroundColor: 'white',
-              boxShadow: '2px 0 12px rgba(0,0,0,0.05)'
+              boxShadow: '2px 0 12px rgba(0,0,0,0.05)',
+              position: 'fixed', // ✅ FIXED para que no ocupe espacio
+              top: 0,
+              left: 0,
+              height: '100vh',
+              zIndex: theme.zIndex.drawer
             },
           }}
           open
         >
           {drawerContent}
         </Drawer>
-      </Box>
+      )}
 
-      {/* Contenido Principal */}
+      {/* Drawer para móvil */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: drawerWidth,
+            borderRight: '1px solid rgba(0,0,0,0.08)',
+            backgroundColor: 'white',
+            boxShadow: '2px 0 12px rgba(0,0,0,0.05)'
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* Contenido Principal - SIN MARGEN IZQUIERDO */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
           width: '100%',
-          marginTop: { xs: '64px', md: 0 },
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          minHeight: { xs: 'calc(100vh - 64px)', md: '100vh' },
-          display: 'flex',
-          justifyContent: 'center'
+          minHeight: '100vh',
+          // ✅ SIN MARGEN IZQUIERDO - el sidebar es fixed
+          mt: { xs: '64px', md: 0 },
+          backgroundColor: '#f8fafc',
+          position: 'relative'
         }}
       >
-        <Box sx={{ width: '100%', maxWidth: '1200px' }}>
-          {children}
+        {/* Contenedor que se adapta al sidebar fijo */}
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: { 
+              xs: '100%', 
+              md: `calc(100% - ${drawerWidth}px)` // ✅ Resta el ancho del sidebar
+            },
+            ml: { md: `${drawerWidth}px` }, // ✅ Empuja el contenido cuando hay sidebar
+            p: { xs: 2, sm: 3, md: 3 },
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        >
+          {/* Contenedor centrado del contenido */}
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1200px',
+              // ✅ Centrado automático
+              mx: 'auto'
+            }}
+          >
+            {children}
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -9,6 +9,11 @@ import RegisterPage from "./pages/RegisterPage";
 import EnhancedLayout from "./components/EnhancedLayout";
 import GestionDeportes from './components/GestionDeportes';
 import GestionCategorias from './components/GestionCategorias';
+import TorneosPage from './pages/TorneosPage';
+import UsuariosPage from "./pages/UsuariosPage";
+import TorneosDisponiblesPage from "./pages/TorneosDisponiblesPage";
+import MisResultadosPage from "./pages/MisResultadosPage";
+
 
 // Componente de carga
 function LoadingSpinner() {
@@ -103,42 +108,6 @@ function PrivateRoute({ children, requiredRole = null }) {
   return <EnhancedLayout>{children}</EnhancedLayout>;
 }
 
-// Páginas de placeholder para rutas en desarrollo
-function TorneosPage() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>Gestión de Torneos</h1>
-      <p>Página en desarrollo - Próximamente</p>
-    </div>
-  );
-}
-
-function UsuariosPage() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>Gestión de Usuarios</h1>
-      <p>Página en desarrollo - Próximamente</p>
-    </div>
-  );
-}
-
-function TorneosDisponiblesPage() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>Torneos Disponibles</h1>
-      <p>Página en desarrollo - Próximamente</p>
-    </div>
-  );
-}
-
-function MisResultadosPage() {
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>Mis Resultados</h1>
-      <p>Página en desarrollo - Próximamente</p>
-    </div>
-  );
-}
 
 function App() {
   return (

@@ -1,5 +1,16 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemText, Box, Button } from '@mui/material';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  IconButton, 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemText, 
+  Box, 
+  Button 
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from 'react-router-dom';
 import { clearAuth, getUsuario } from '../utils/auth';
@@ -16,7 +27,7 @@ export default function Layout({ children }) {
 
   const isAdmin = usuario?.rol === 'admin';
 
-  const menuItems = isAdmin 
+  const menuItems = isAdmin
     ? [
         { text: 'Inicio', path: '/dashboard' },
         { text: 'Torneos', path: '/dashboard/torneos' },
@@ -30,27 +41,39 @@ export default function Layout({ children }) {
 
   return (
     <Box sx={{ display: 'flex' }}>
+      {/* Barra superior */}
       <AppBar position="fixed">
         <Toolbar>
-          <IconButton color="inherit" edge="start" onClick={() => setOpen(true)} sx={{ mr: 2 }}>
+          <IconButton
+            color="inherit"
+            edge="start"
+            onClick={() => setOpen(true)}
+            sx={{ mr: 2 }}
+          >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             {isAdmin ? 'Dashboard Administrativo' : 'Mi Perfil - Atleta'}
           </Typography>
-          <Typography variant="body1" sx={{ mr: 2 }}>{usuario?.nombre}</Typography>
-          <Button color="inherit" onClick={handleLogout}>Cerrar sesión</Button>
+          <Typography variant="body1" sx={{ mr: 2 }}>
+            {usuario?.nombre}
+          </Typography>
+          <Button color="inherit" onClick={handleLogout}>
+            Cerrar sesión
+          </Button>
         </Toolbar>
       </AppBar>
+
+      {/* Menú lateral */}
       <Drawer open={open} onClose={() => setOpen(false)}>
         <List sx={{ width: 240 }}>
           {menuItems.map((item) => (
-            <ListItem 
-              button 
+            <ListItem
+              button
               key={item.text}
-              onClick={() => { 
-                navigate(item.path); 
-                setOpen(false); 
+              onClick={() => {
+                navigate(item.path);
+                setOpen(false);
               }}
             >
               <ListItemText primary={item.text} />
@@ -58,8 +81,24 @@ export default function Layout({ children }) {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-        {children}
+
+      {/* Contenido principal */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          pt: { xs: 10, sm: 11 },
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          px: { xs: 2, sm: 4 },
+          overflowX: 'hidden',
+        }}
+      >
+        <Box sx={{ width: '100%', maxWidth: '1300px' }}>
+          {children}
+        </Box>
       </Box>
     </Box>
   );

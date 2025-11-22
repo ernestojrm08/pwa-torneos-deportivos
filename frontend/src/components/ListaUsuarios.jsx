@@ -25,8 +25,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Select,
-  CircularProgress
+  Select
 } from '@mui/material';
 import {
   Edit,
@@ -60,7 +59,6 @@ export default function ListaUsuarios() {
   const fetchUsuarios = async () => {
     try {
       setLoading(true);
-      setError('');
       const { data } = await api.get('/admin/usuarios');
       setUsuarios(data);
     } catch (err) {
@@ -108,7 +106,6 @@ export default function ListaUsuarios() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setError('');
       await api.put(`/admin/usuarios/${usuarioSeleccionado.id}`, form);
       await fetchUsuarios();
       setSuccess('Usuario actualizado correctamente');
@@ -121,7 +118,6 @@ export default function ListaUsuarios() {
 
   const handleDelete = async () => {
     try {
-      setError('');
       await api.delete(`/admin/usuarios/${usuarioSeleccionado.id}`);
       await fetchUsuarios();
       setSuccess('Usuario eliminado correctamente');
@@ -137,31 +133,14 @@ export default function ListaUsuarios() {
   const totalAdmins = usuarios.filter(u => u.rol === 'admin').length;
   const totalAtletas = usuarios.filter(u => u.rol === 'atleta').length;
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <Box>
       <Typography variant="h4" fontWeight="800" gutterBottom>
         Gestión de Usuarios
       </Typography>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
-      
-      {success && (
-        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
-          {success}
-        </Alert>
-      )}
+      {error && <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>{success}</Alert>}
 
       {/* Estadísticas */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -229,46 +208,39 @@ export default function ListaUsuarios() {
                 <TableCell sx={{ color: 'white', fontWeight: '800' }}>Usuario</TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: '800' }}>Email</TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: '800' }}>Rol</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: '800' }}>Fecha Registro</TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: '800' }}>Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {usuarios.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      No hay usuarios registrados
+              {usuarios.map((usuario) => (
+                <TableRow key={usuario.id} hover>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight="600">
+                      {usuario.nombre}
                     </Typography>
                   </TableCell>
+                  <TableCell>{usuario.email}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={usuario.rol}
+                      color={usuario.rol === 'admin' ? 'primary' : 'default'}
+                      variant={usuario.rol === 'admin' ? 'filled' : 'outlined'}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {usuario.created_at ? new Date(usuario.created_at).toLocaleDateString('es-ES') : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={(e) => handleOpenMenu(e, usuario)}
+                    >
+                      <MoreVert />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
-              ) : (
-                usuarios.map((usuario) => (
-                  <TableRow key={usuario.id} hover>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="600">
-                        {usuario.nombre}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{usuario.email}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={usuario.rol === 'admin' ? 'Administrador' : 'Atleta'}
-                        color={usuario.rol === 'admin' ? 'primary' : 'default'}
-                        variant={usuario.rol === 'admin' ? 'filled' : 'outlined'}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        onClick={(e) => handleOpenMenu(e, usuario)}
-                        size="small"
-                      >
-                        <MoreVert />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -281,22 +253,20 @@ export default function ListaUsuarios() {
         onClose={handleCloseMenu}
       >
         <MenuItem onClick={handleOpenEditDialog}>
-          <Edit sx={{ mr: 1, fontSize: 20 }} /> Editar
+          <Edit sx={{ mr: 1 }} /> Editar
         </MenuItem>
         <MenuItem onClick={handleOpenDeleteDialog} sx={{ color: 'error.main' }}>
-          <Delete sx={{ mr: 1, fontSize: 20 }} /> Eliminar
+          <Delete sx={{ mr: 1 }} /> Eliminar
         </MenuItem>
       </Menu>
 
       {/* Dialog para editar usuario */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          Editar Usuario - {usuarioSeleccionado?.nombre}
-        </DialogTitle>
+        <DialogTitle>Editar Usuario</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <TextField
-              label="Nombre completo"
+              label="Nombre"
               value={form.nombre}
               onChange={(e) => setForm({ ...form, nombre: e.target.value })}
               fullWidth
@@ -304,7 +274,7 @@ export default function ListaUsuarios() {
               required
             />
             <TextField
-              label="Correo electrónico"
+              label="Email"
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -313,10 +283,10 @@ export default function ListaUsuarios() {
               required
             />
             <FormControl fullWidth margin="normal">
-              <InputLabel>Tipo de usuario</InputLabel>
+              <InputLabel>Rol</InputLabel>
               <Select
                 value={form.rol}
-                label="Tipo de usuario"
+                label="Rol"
                 onChange={(e) => setForm({ ...form, rol: e.target.value })}
               >
                 <MenuItem value="atleta">Atleta</MenuItem>
@@ -325,12 +295,8 @@ export default function ListaUsuarios() {
             </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} color="inherit">
-              Cancelar
-            </Button>
-            <Button type="submit" variant="contained" color="primary">
-              Guardar cambios
-            </Button>
+            <Button onClick={handleCloseDialog}>Cancelar</Button>
+            <Button type="submit" variant="contained">Actualizar</Button>
           </DialogActions>
         </form>
       </Dialog>
@@ -341,19 +307,12 @@ export default function ListaUsuarios() {
         <DialogContent>
           <Typography>
             ¿Estás seguro de que deseas eliminar al usuario <strong>{usuarioSeleccionado?.nombre}</strong>?
-          </Typography>
-          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            Esta acción no se puede deshacer y se eliminarán todas sus inscripciones y resultados.
+            Esta acción no se puede deshacer.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button 
-            onClick={handleDelete} 
-            variant="contained" 
-            color="error"
-            startIcon={<Delete />}
-          >
+          <Button onClick={handleDelete} variant="contained" color="error">
             Eliminar
           </Button>
         </DialogActions>
